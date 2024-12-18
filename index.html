@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Movie Watch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Boxicons Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: #1f1f1f;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: #ff5722;
+        }
+
+        .search-bar {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            font-size: 1rem;
+            width: 60%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .search-bar button:hover {
+            background-color: #e64a19;
+        }
+
+        .movies-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .movie {
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .movie:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
+        }
+
+        .movie img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .movie-info h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .movie-info p {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            color: #aaa;
+        }
+
+        .movie-watch {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .movie:hover .movie-watch {
+            display: block;
+        }
+
+        .movie-watch i {
+            margin-right: 8px;
+        }
+
+        footer {
+            background-color: #1f1f1f;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .modal-content iframe {
+            width: 100%;
+            height: 450px;
+            border-radius: 10px;
+        }
+
+        .modal-close {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .modal-close:hover {
+            background-color: #e64a19;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Online Movie Watch</h1>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search for movies...">
+        <button onclick="searchMovies()">Search</button>
+    </div>
+
+    <!-- Google Ad Section -->
+    <div style="text-align: center; margin: 20px 0;">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXX"
+             data-ad-slot="XXXXXX"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <div class="movies-container" id="moviesContainer">
+        <!-- Movies will be loaded here dynamically -->
+    </div>
+
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <iframe id="moviePlayer" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Online Movie Watch. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const apiKey = "51e9b152256ca06b9e3e16fa98dc4981";
+        const apiUrl = "https://api.themoviedb.org/3";
+        const imgBaseUrl = "https://image.tmdb.org/t/p/w500";
+
+        // Fetch and display popular movies on page load
+        window.onload = function() {
+            fetch(`${apiUrl}/movie/popular?api_key=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayMovies(data.results);
+                })
+                .catch(error => console.error('Error fetching popular movies:', error));
+        };
+
+        // Display movies
+        function displayMovies(movies) {
+            const container = document.getElementById('moviesContainer');
+            container.innerHTML = ""; // Clear previous results
+            movies.forEach(movie => {
+                const movieElement = document.createElement('div');
+                movieElement.className = 'movie';
+                movieElement.innerHTML = `
+                    <img src="${imgBaseUrl + movie.poster_path}" alt="${movie.title}">
+                    <div class="movie-info">
+                        <h3>${movie.title}</h3>
+                        <p>Rating: ${movie.vote_average}</p>
+                    </div>
+                    <div class="movie-watch" onclick="watchMovie('${movie.id}')">
+                        <i class="bx bx-play"></i> Watch Now
+                    </div>
+                `;
+                container.appendChild(movieElement);
+            });
+        }
+
+        // Search movies by title
+        function searchMovies() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            fetch(`${apiUrl}/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayMovies(data.results);
+                })
+                .catch(error => console.error('Error searching movies:', error));
+        }
+
+        // Watch movie by opening YouTube video link
+        function watchMovie(movieId) {
+            const modal = document.getElementById('movieModal');
+            const player = document.getElementById('moviePlayer');
+
+            // Fetch movie video (You can replace this with actual movie URL)
+            fetch(`${apiUrl}/movie/${movieId}/videos?api_key=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const videoUrl = `https://www.youtube.com/embed/${data.results[0]?.key}?autoplay=1`;
+                    player.src = videoUrl;
+                    modal.classList.add('active');
+                })
+                .catch(error => console.error('Error fetching movie video:', error));
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('movieModal');
+            const player = document.getElementById('moviePlayer');
+
+            player.src = ""; // Stop video playback
+            modal.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
+
